@@ -20,6 +20,8 @@ const Game = () => {
     const [fails, setFails] = useState([])
     //state for status of game (has player lost or not) - this is used for when the end of the game happens, and the popup needs to decide if the player won or lost
     const [status, setStatus] = useState('')
+    //state for help popup
+    const [help, setHelp ] = useState(false)
 
     //async function to fetch a random word from an api
     const fetchWord = async () => {
@@ -90,6 +92,10 @@ const Game = () => {
         //fetch word again 
         fetchWord()
     }
+
+    const handleHelp = () => {
+        setHelp(!help)
+    }
     
     //variable that holds the alphabet used to display input to user
     const letters = 'abcdefghijklmnopqrstuvwxyz'
@@ -131,9 +137,46 @@ const Game = () => {
                 //if the word state doesn't exist then don't render the above
             ): null}
             {/* if word state exists render 'chancesLeft' component with fails state passed as props */}
-            {word?(
-                <ChancesLeft fails={fails} />
-            ): null}
+            <Stack direction='row' spacing={5} justifyContent="flex-end" alignItems="flex-end">
+                {word?(
+                    <ChancesLeft fails={fails} />
+                ): null}
+                {/* Help button will render if state of help is true. By default it is false and buttons inside the popup will toggle its state */}
+                {help?(
+                    <Box sx={{
+                        position: 'absolute',
+                        top: '50%',
+                        left: '50%',
+                        width: '50vw',
+                        height: '30vh',
+                        transform: 'translate(-50%, -50%)',
+                        backgroundColor: `rgba(0, 255, 0.2, 0.2)`,
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        zIndex: 999,
+                        padding: '30px'
+                    }}>
+                        <Stack direction={'row'}>
+                            <Typography sx={{opacity: '1.0', fontSize: '2rem', fontWeight: 'bold', textShadow: '2px 2px 4px rgba(0, 0, 0, 0.5)'}}>
+                                Click one of the letters to make a guess,
+                                if you guessed correct, you will see the letter in the word,
+                                else you will start drawing the hangman. You have 10 chances before the game is over
+                                
+                            </Typography>
+                            <Button variant="contained" onClick={handleHelp} sx={{position: 'absolute', top: 0, right: 0}}>Close</Button>
+                        </Stack>
+                            
+                    </Box>
+                ): null}
+                {/*if help is false, render help button */}
+                {!help?(
+                    <Button variant="contained" onClick={handleHelp}>Help</Button>
+                ):null}
+                
+
+            </Stack>
+
             
                 {/*If word does not exist, render play button */}
             {!word?(
@@ -169,7 +212,8 @@ const Game = () => {
                     alignItems: 'center',
                     float: 'right',
                     flexDirection: 'row',
-                    marginLeft: '50px'
+                    marginLeft: '50px',
+                    
                     }}>
                         {/*split the uppercase letters variable and map each letter to a button component with a letter component */}
                     {letters.toUpperCase().split('').map((letter, index) =>{
